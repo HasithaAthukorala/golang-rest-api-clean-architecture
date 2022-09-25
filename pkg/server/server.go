@@ -5,7 +5,8 @@ import (
 	"fmt"
 	"github.com/gorilla/mux"
 	"go.uber.org/zap"
-	"golang-rest-api-clean-architecture/pkg/entities"
+	"golang-rest-api-clean-architecture/pkg/api"
+	services "golang-rest-api-clean-architecture/pkg/external-services"
 	"net/http"
 )
 
@@ -24,16 +25,16 @@ type Server struct {
 
 type Routes struct {
 	Prefix string
-	Routes []entities.Route
+	Routes []api.Route
 }
 
-func HandleWithClientSet(clientSet entities.ClientSet, handle entities.HandlerFunc) func(w http.ResponseWriter, req *http.Request) {
+func HandleWithClientSet(clientSet services.ClientSet, handle api.HandlerFunc) func(w http.ResponseWriter, req *http.Request) {
 	return func(w http.ResponseWriter, req *http.Request) {
 		handle(clientSet, w, req)
 	}
 }
 
-func New(clientSet entities.ClientSet, routes Routes, opt Options, logger *zap.SugaredLogger) *Server {
+func New(clientSet services.ClientSet, routes Routes, opt Options, logger *zap.SugaredLogger) *Server {
 	logger = logger.Named("http-server")
 	r := mux.NewRouter().StrictSlash(true)
 	r.Use(ResponseHeadersMiddleware(map[string]string{
@@ -46,7 +47,7 @@ func New(clientSet entities.ClientSet, routes Routes, opt Options, logger *zap.S
 		//secured.Use() TODO: handle authentication here
 	}
 
-	addRouteFunc := func(r *mux.Router, route entities.Route, prefix string) {
+	addRouteFunc := func(r *mux.Router, route api.Route, prefix string) {
 		newRoute := r.NewRoute()
 		newRoute.PathPrefix(prefix)
 		if len(route.Path) > 0 {

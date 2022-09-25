@@ -3,8 +3,10 @@ package main
 import (
 	"go.uber.org/zap"
 	v1 "golang-rest-api-clean-architecture/pkg/api/v1"
+	"golang-rest-api-clean-architecture/pkg/config"
 	services "golang-rest-api-clean-architecture/pkg/external-services"
 	"golang-rest-api-clean-architecture/pkg/server"
+	"log"
 	"os"
 	"os/signal"
 	"syscall"
@@ -12,7 +14,12 @@ import (
 
 func main() {
 	stopCh := setupSignalHandler()
-	clientSet, _ := services.NewClients()
+	cfg, err := config.Load("config")
+	if err != nil {
+		log.Fatalf("cannot read config file: %s", err.Error())
+	}
+
+	clientSet, _ := services.NewClients(cfg)
 	opt := server.Options{
 		Port:       8080,
 		EnableAuth: true,
