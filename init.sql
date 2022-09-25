@@ -11,7 +11,8 @@ CREATE TABLE IF NOT EXISTS companies (
     phone VARCHAR(30) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY ( id )
+    PRIMARY KEY (id),
+    UNIQUE KEY(name)
 );
 
 INSERT INTO rest_api.companies (name, code, country, website, phone, created_at, updated_at) VALUES ('Apple', '1f22d', 'USA', 'https://apple.com', '+761209121233', DEFAULT, DEFAULT)

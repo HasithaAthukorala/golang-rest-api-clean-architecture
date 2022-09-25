@@ -3,7 +3,7 @@ package database
 import (
 	"github.com/sirupsen/logrus"
 	"golang-rest-api-clean-architecture/pkg/config"
-	"golang-rest-api-clean-architecture/pkg/entities"
+	"golang-rest-api-clean-architecture/pkg/external-services/database/repositories"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -11,7 +11,7 @@ import (
 )
 
 type DbClient interface {
-	GetCompanies() []entities.Company
+	GetCompanyRepository() repositories.CompanyRepository
 }
 
 type dbClient struct {
@@ -30,7 +30,6 @@ func New(cfg *config.Config) DbClient {
 		Logger:                 gormLogger,
 		SkipDefaultTransaction: true,
 	})
-
 	if err != nil {
 		logrus.Fatal(err)
 	}
@@ -39,8 +38,6 @@ func New(cfg *config.Config) DbClient {
 	}
 }
 
-func (client *dbClient) GetCompanies() []entities.Company {
-	var companies []entities.Company
-	client.db.Find(&companies)
-	return companies
+func (client *dbClient) GetCompanyRepository() repositories.CompanyRepository {
+	return repositories.GetCompanyRepository(client.db)
 }

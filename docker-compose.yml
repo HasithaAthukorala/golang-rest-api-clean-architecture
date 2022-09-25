@@ -1,6 +1,6 @@
 version: '3.8'
 services:
-  db:
+  mysql:
     image: mysql:8.0
     cap_add:
       - SYS_NICE
@@ -11,8 +11,25 @@ services:
     ports:
       - '3306:3306'
     volumes:
-      - db:/var/lib/mysql
+      - mysql:/var/lib/mysql
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: 'rabbitmq'
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq:/var/lib/rabbitmq/
+      - rabbitmq:/var/log/rabbitmq
+    networks:
+      - rabbitmq_go_net
 volumes:
-  db:
+  mysql:
     driver: local
+  rabbitmq:
+    driver: local
+
+networks:
+  rabbitmq_go_net:
+    driver: bridge

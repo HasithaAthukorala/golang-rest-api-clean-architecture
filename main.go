@@ -1,7 +1,7 @@
 package main
 
 import (
-	"go.uber.org/zap"
+	"github.com/sirupsen/logrus"
 	v1 "golang-rest-api-clean-architecture/pkg/api/v1"
 	"golang-rest-api-clean-architecture/pkg/config"
 	services "golang-rest-api-clean-architecture/pkg/external-services"
@@ -19,21 +19,18 @@ func main() {
 		log.Fatalf("cannot read config file: %s", err.Error())
 	}
 
-	clientSet, _ := services.NewClients(cfg)
+	clientSet, _ := services.NewClients(cfg, stopCh)
 	opt := server.Options{
 		Port:       8080,
 		EnableAuth: true,
 	}
-	logger, _ := zap.NewProduction()
-	defer logger.Sync() // flushes buffer, if any
-	sugaredLogger := logger.Sugar()
 	routes := server.Routes{
 		Prefix: "/api/v1",
 		Routes: v1.Build(),
 	}
-	srv := server.New(clientSet, routes, opt, sugaredLogger)
+	srv := server.New(clientSet, routes, opt)
 	if err := srv.Run(stopCh); err != nil {
-		sugaredLogger.Fatalf("Failed to run the api-server: %v", err)
+		logrus.Fatalf("Failed to run the api-server: %v", err)
 	}
 }
 

@@ -8,9 +8,8 @@ import (
 type HandlerFunc func(clientSet services.ClientSet, w http.ResponseWriter, req *http.Request)
 
 type Route struct {
-	Path               string
-	Insecure           bool
-	LocationValidation bool
-	Method             string
-	HandlerFunc        HandlerFunc
+	Path        string
+	Insecure    bool
+	Method      string
+	HandlerFunc HandlerFunc
 }

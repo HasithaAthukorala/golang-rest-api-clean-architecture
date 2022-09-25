@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/gorilla/mux"
-	"go.uber.org/zap"
+	"github.com/sirupsen/logrus"
 	"golang-rest-api-clean-architecture/pkg/api"
 	services "golang-rest-api-clean-architecture/pkg/external-services"
 	"net/http"
@@ -19,7 +19,6 @@ type RouterFunc func(*mux.Router)
 
 type Server struct {
 	opt    *Options
-	logger *zap.SugaredLogger
 	router *mux.Router
 }
 
@@ -34,17 +33,19 @@ func HandleWithClientSet(clientSet services.ClientSet, handle api.HandlerFunc) f
 	}
 }
 
-func New(clientSet services.ClientSet, routes Routes, opt Options, logger *zap.SugaredLogger) *Server {
-	logger = logger.Named("http-server")
+func New(clientSet services.ClientSet, routes Routes, opt Options) *Server {
 	r := mux.NewRouter().StrictSlash(true)
 	r.Use(ResponseHeadersMiddleware(map[string]string{
 		"Content-Type": "application/json",
 	}))
+	r.Use(RecovererOnPanic)
+
 	secured := r.Name("secured").Subrouter()
 	unsecured := r.Name("unsecured").Subrouter()
 
 	if opt.EnableAuth {
-		//secured.Use() TODO: handle authentication here
+		secured.Use(JwtMiddleware(clientSet.AuthenticationClient()))
+		secured.Use(LocationVerificationMiddleware(clientSet.LocationVerificationClient()))
 	}
 
 	addRouteFunc := func(r *mux.Router, route api.Route, prefix string) {
@@ -67,7 +68,6 @@ func New(clientSet services.ClientSet, routes Routes, opt Options, logger *zap.S
 	}
 	srv := &Server{
 		opt:    &opt,
-		logger: logger,
 		router: r,
 	}
 	return srv
@@ -80,12 +80,12 @@ func (s *Server) Run(stopCh <-chan struct{}) error {
 		Handler: s.router,
 	}
 	go func() {
-		s.logger.Infof("serving on %s", addr)
+		logrus.Infof("serving on %s", addr)
 		if err := srv.ListenAndServe(); err != http.ErrServerClosed {
-			s.logger.Errorf("listenAndServe error: %v", err)
+			logrus.Errorf("listenAndServe error: %v", err)
 		}
 	}()
 	<-stopCh
-	s.logger.Info("shutting down server...")
+	logrus.Info("shutting down the server...")
 	return srv.Shutdown(context.Background())
 }

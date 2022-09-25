@@ -10,7 +10,9 @@ var lock = &sync.Mutex{}
 var config Config
 
 type Config struct {
-	DbDSN string `json:"dbDSN"`
+	DbDSN                       string `json:"dbDSN"`
+	LocationVerificationHostURL string `json:"locationVerificationHostURL"`
+	ServiceBusConnectionString  string `json:"serviceBusConnectionString"`
 }
 
 func Load(fileName string) (*Config, error) {
