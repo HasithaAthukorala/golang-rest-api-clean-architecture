@@ -10,6 +10,8 @@ import (
 	"time"
 )
 
+//go:generate moq -out client.fake.go . DbClient
+
 type DbClient interface {
 	GetCompanyRepository() repositories.CompanyRepository
 }

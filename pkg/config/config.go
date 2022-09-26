@@ -31,7 +31,6 @@ func Load(fileName string) (*Config, error) {
 		if err := viper.ReadInConfig(); err != nil {
 			return nil, fmt.Errorf("error loading application config file :%v", err)
 		}
-
 		if err := viper.Unmarshal(&config); err != nil {
 			return nil, fmt.Errorf("malformed JSON config file :%v", err)
 		}

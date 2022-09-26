@@ -13,8 +13,6 @@ import (
 	"strings"
 )
 
-// TODO: add authentication handler and location based handler middlewares here
-
 func ResponseHeadersMiddleware(headers map[string]string) mux.MiddlewareFunc {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
@@ -59,7 +57,7 @@ func JwtMiddleware(authClient authenticator.AuthenticationClient) mux.Middleware
 	}
 }
 
-func LocationVerificationMiddleware(verificationClient location_verifier.LocationVerifier) mux.MiddlewareFunc {
+func LocationVerificationMiddleware(verificationClient location_verifier.LocationVerificationClient) mux.MiddlewareFunc {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 			ipAddress, err := getIP(req)

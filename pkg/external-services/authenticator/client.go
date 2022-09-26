@@ -1,5 +1,7 @@
 package authenticator
 
+//go:generate moq -out client.fake.go . AuthenticationClient
+
 type AuthenticationClient interface {
 	Authenticate(token string) bool
 }

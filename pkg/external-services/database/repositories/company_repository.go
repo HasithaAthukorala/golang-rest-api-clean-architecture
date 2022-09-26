@@ -5,6 +5,8 @@ import (
 	"gorm.io/gorm"
 )
 
+//go:generate moq -out company_repository.fake.go . CompanyRepository
+
 type CompanyRepository interface {
 	GetCompanies() []entities.Company
 	GetCompanyById(id int) entities.Company

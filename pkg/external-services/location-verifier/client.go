@@ -10,27 +10,29 @@ import (
 	"net/url"
 )
 
-type LocationVerifier interface {
+//go:generate moq -out client.fake.go . LocationVerificationClient
+
+type LocationVerificationClient interface {
 	Verify(ipAddress string) (bool, error)
 }
 
-type locationVerifier struct {
+type locationVerificationClient struct {
 	httpClient *http.Client
 	hostUrl    *url.URL
 }
 
-func New(cfg *config.Config) (LocationVerifier, error) {
+func New(cfg *config.Config) (LocationVerificationClient, error) {
 	URL, err := url.Parse(cfg.LocationVerificationHostURL)
 	if err != nil {
 		return nil, fmt.Errorf("error occured while initializing location verifier: %v", err)
 	}
-	return &locationVerifier{
+	return &locationVerificationClient{
 		hostUrl:    URL,
 		httpClient: &http.Client{},
 	}, nil
 }
 
-func (client *locationVerifier) Verify(ipAddress string) (bool, error) {
+func (client *locationVerificationClient) Verify(ipAddress string) (bool, error) {
 	endpoint := fmt.Sprintf("%s/json/%s", client.hostUrl, ipAddress)
 	req, err := http.NewRequest(http.MethodGet, endpoint, nil)
 	if err != nil {

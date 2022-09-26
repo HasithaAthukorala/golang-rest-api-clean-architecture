@@ -10,6 +10,8 @@ import (
 	"time"
 )
 
+//go:generate moq -out client.fake.go . ServiceBusClient
+
 type ServiceBusClient interface {
 	Publish(company *entities.Company)
 }

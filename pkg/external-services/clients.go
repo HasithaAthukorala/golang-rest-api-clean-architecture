@@ -8,17 +8,19 @@ import (
 	service_bus "golang-rest-api-clean-architecture/pkg/external-services/service-bus"
 )
 
+//go:generate moq -out clients.fake.go . ClientSet
+
 type ClientSet interface {
 	DbClient() database.DbClient
 	AuthenticationClient() authenticator.AuthenticationClient
-	LocationVerificationClient() location_verifier.LocationVerifier
+	LocationVerificationClient() location_verifier.LocationVerificationClient
 	ServiceBusClient() service_bus.ServiceBusClient
 }
 
 type clientSet struct {
 	dbClient                   database.DbClient
 	authenticationClient       authenticator.AuthenticationClient
-	locationVerificationClient location_verifier.LocationVerifier
+	locationVerificationClient location_verifier.LocationVerificationClient
 	serviceBusClient           service_bus.ServiceBusClient
 }
 
@@ -46,7 +48,7 @@ func (clients *clientSet) AuthenticationClient() authenticator.AuthenticationCli
 	return clients.authenticationClient
 }
 
-func (clients *clientSet) LocationVerificationClient() location_verifier.LocationVerifier {
+func (clients *clientSet) LocationVerificationClient() location_verifier.LocationVerificationClient {
 	return clients.locationVerificationClient
 }
 
